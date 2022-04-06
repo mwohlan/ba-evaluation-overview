@@ -3,7 +3,7 @@ import type { QuestionResult } from '../../types'
 
 const route = useRoute()
 
-const { data: questionResults } = await useLazyFetch<QuestionResult[]>('/api/questionResultData', { params: route.params })
+const { data: questionResults, pending } = await useLazyFetch<QuestionResult[]>('/api/questionResultData', { params: route.params })
 
 definePageMeta({
   layout: 'default',
@@ -25,8 +25,9 @@ definePageMeta({
           Question Results
         </div>
 
-        <ul gap-y-4 flex flex-col max-w-2xl w-screen px-4 relative>
-          <div v-for="questionResult in questionResults" :key="questionResult.evaluationId" px-3 py-2 space-y-4 w-full shadow-md bg-white rounded-md>
+        <ul gap-y-4 flex flex-col max-w-2xl w-screen px-4>
+          <div v-if="pending" self-center text-gray-700 w-14 h-14 i-eos-icons:loading />
+          <div v-for="questionResult in questionResults" v-else :key="questionResult.evaluationId" px-3 py-2 space-y-4 w-full shadow-md bg-white rounded-md>
             <div flex justify-between>
               <NuxtLink text-gray-600 hover:text-gray-800 flex items-center gap-x-2 :to="{name:'index'}">
                 <div h-5 w-5 i-ic:outline-arrow-back />
