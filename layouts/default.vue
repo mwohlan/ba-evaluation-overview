@@ -6,7 +6,7 @@ definePageMeta({
 
 <template>
   <main class="h-screen w-screen sib bg-warm-gray-100 overflow-x-hidden overflow-y-auto font-mulish">
-    <Link rel="icon" type="image/x-icon" href="/favicon.png" />
+    <Link rel="icon" type="image/x-icon" href="/favicon.svg" />
     <slot />
   </main>
 </template>
