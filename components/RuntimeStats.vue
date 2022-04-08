@@ -13,7 +13,8 @@ const [showRuntimeStats, toggleRuntimeStats] = useToggle(false)
       <div>
         {{ showRuntimeStats ? 'Hide':'Show' }} Runtime Stats
       </div>
-      <div duration-300 :class="showRuntimeStats ? 'rotate-180' : 'rotate-0'" i-ic:outline-keyboard-arrow-down h-5 w-5 />
+      <div v-if="!showRuntimeStats" i-ic:outline-keyboard-arrow-down h-5 w-5 />
+      <div v-else i-ic:outline-keyboard-arrow-up h-5 w-5 />
     </div>
     <li v-if="showRuntimeStats" flex>
       <table class="mt-1 flex-1 divide-y divide-gray-300 border-2 border-gray-300">
