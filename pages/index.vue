@@ -35,7 +35,7 @@ definePageMeta({
       <div text-2xl font-bold mb-10>
         Evaluations Overview
       </div>
-      <ul flex gap-y-6 flex-col max-w-2xl w-screen px-4>
+      <ul flex gap-y-6 flex-col max-w-3xl w-screen px-4>
         <div v-for="evaluation in sortedEvaluations" :key="evaluation.firestoreId" hover="ring-2 ring-gray-400" px-3 py-2 shadow-md bg-white rounded-md>
           <div flex justify-between>
             <NuxtLink text-gray-600 hover:text-gray-800 flex items-center gap-x-2 :to="{name:'evaluation-evaluationId',params:{evaluationId: evaluation.firestoreId }}">
@@ -52,69 +52,61 @@ definePageMeta({
             Training Config
           </div>
           <li flex>
-            <div flex flex-1 flex-col>
-              <table class="mt-1 divide-y divide-gray-300  border-gray-300 border-2">
-                <tbody class="bg-white">
-                  <!-- Odd row -->
-                  <tr v-for="(value,type,index) in orderedByKey(evaluation.trainingConfig)" :key="type" capitalize :class="index % 2 == 0 ? 'bg-gray-100': 'bg-white'">
-                    <td class="whitespace-nowrap py-1 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                      {{ type }}
-                    </td>
-                    <td class="whitespace-nowrap px-3 p1-4 text-right text-sm text-gray-700">
-                      {{ value }}
-                    </td>
-                  </tr>
+            <table class="mt-1 flex-1 divide-y divide-gray-300  border-gray-300 border-2">
+              <tbody class="bg-white">
+                <!-- Odd row -->
+                <tr v-for="(value,type,index) in orderedByKey(evaluation.trainingConfig)" :key="type" capitalize :class="index % 2 == 0 ? 'bg-gray-100': 'bg-white'">
+                  <td class="py-1 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                    {{ type === "trainingfScoreThreshold" ? "fScoreThreshold" : type }}
+                  </td>
+                  <td class=" px-3 pl-4 text-right text-sm text-gray-700">
+                    {{ value }}
+                  </td>
+                </tr>
 
-                  <!-- More people... -->
-                </tbody>
-              </table>
-            </div>
+                <!-- More people... -->
+              </tbody>
+            </table>
           </li>
           <div mx-auto text-gray-600 w-fit text-lg font-semibold>
             Metric Config
           </div>
           <li flex>
-            <div flex flex-1 flex-col>
-              <table class="mt-1 divide-y divide-gray-300  border-gray-300 border-2">
-                <tbody class="bg-white">
-                  <!-- Odd row -->
-                  <tr v-for="(metric,index) in evaluation.metricConfigs" :key="metric.name" :class="index % 2 == 0 ? 'bg-gray-100': 'bg-white'">
-                    <td class="whitespace-nowrap py-1 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                      {{ metric.name }}
-                    </td>
-                    <td class="whitespace-nowrap px-3 p1-4 text-right text-sm text-gray-700">
-                      {{ metric.weight.toFixed(3) }}
-                    </td>
-                  </tr>
+            <table class="mt-1 flex-1 divide-y divide-gray-300  border-gray-300 border-2">
+              <tbody class="bg-white">
+                <!-- Odd row -->
+                <tr v-for="(metric,index) in evaluation.metricConfigs" :key="metric.name" :class="index % 2 == 0 ? 'bg-gray-100': 'bg-white'">
+                  <td class="py-1 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                    {{ metric.name }}
+                  </td>
+                  <td class="whitespace-nowrap px-3 p1-4 text-right text-sm text-gray-700">
+                    {{ metric.weight.toFixed(3) }}
+                  </td>
+                </tr>
 
-                  <!-- More people... -->
-                </tbody>
-              </table>
-            </div>
+                <!-- More people... -->
+              </tbody>
+            </table>
           </li>
           <div mx-auto w-fit text-gray-600 text-lg font-semibold>
             NLP Modules
           </div>
           <li flex>
-            <div flex-1 flex flex-col>
-              <table class="mt-1 divide-y divide-gray-300 border-2 border-gray-300">
-                <tbody class="bg-white">
-                  <!-- Odd row -->
-                  <tr v-for="(modules,type,index) in orderedByKey(evaluation.nlpConfig)" :key="type" capitalize :class="index % 2 == 0 ? 'bg-gray-100': 'bg-white'">
-                    <td class="whitespace-nowrap py-1 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                      {{ type }}
-                    </td>
-                    <td class="whitespace-nowrap px-3 p1-4 text-right font-medium text-sm text-gray-700">
-                      <div v-for="(module) in modules" :key="module" class="mt-1">
-                        {{ module }}
-                      </div>
-                    </td>
-                  </tr>
-
-                  <!-- More people... -->
-                </tbody>
-              </table>
-            </div>
+            <table class="flex-1 mt-1 divide-y divide-gray-300 border-2 border-gray-300">
+              <tbody class="bg-white">
+                <!-- Odd row -->
+                <tr v-for="(modules,type,index) in orderedByKey(evaluation.nlpConfig)" :key="type" capitalize :class="index % 2 == 0 ? 'bg-gray-100': 'bg-white'">
+                  <td class="py-1 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                    {{ type }}
+                  </td>
+                  <td class="px-3 p1-4 text-right font-medium text-sm text-gray-700">
+                    <div v-for="(module) in modules" :key="module" class="mt-1">
+                      {{ module }}
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </li>
           <RuntimeStats mt-2 :evaluation="evaluation" />
           <div class="flex mt-2 justify-end">

@@ -72,6 +72,7 @@ export interface TrainingConfig {
   testFilter: number[]
   testSet: string
   trainingSet: string
+  trainingfScoreThreshold: number
 }
 
 export interface Evaluation {

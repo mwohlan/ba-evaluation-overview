@@ -16,31 +16,29 @@ const [showRuntimeStats, toggleRuntimeStats] = useToggle(false)
       <div duration-300 :class="showRuntimeStats ? 'rotate-180' : 'rotate-0'" i-ic:outline-keyboard-arrow-down h-5 w-5 />
     </div>
     <li v-if="showRuntimeStats" flex>
-      <div flex-1 flex flex-col>
-        <table class="mt-1 divide-y divide-gray-300 border-2 border-gray-300">
-          <tbody class="bg-white">
-            <!-- Odd row -->
-            <tr v-for="(value,setting,index) in orderedByKey(evaluation.settings)" :key="setting" capitalize :class="index % 2 == 0 ? 'bg-gray-100': 'bg-white'">
-              <td class="whitespace-nowrap py-1 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                {{ setting }}
-              </td>
-              <td class="whitespace-nowrap px-3 p1-4 text-right text-sm text-gray-700">
-                {{ value }}
-              </td>
-            </tr>
-            <tr v-for="(value,setting,index) in orderedByKey(evaluation.evaluationResult.runtimeStats)" :key="setting" capitalize :class="(Object.keys(evaluation.settings).length + index) % 2 == 0 ? 'bg-gray-100': 'bg-white'">
-              <td class="whitespace-nowrap py-1 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                {{ setting }}
-              </td>
-              <td class="whitespace-nowrap px-3 p1-4 text-right text-sm text-gray-700">
-                {{ value.toFixed(2) }}
-              </td>
-            </tr>
+      <table class="mt-1 flex-1 divide-y divide-gray-300 border-2 border-gray-300">
+        <tbody class="bg-white">
+          <!-- Odd row -->
+          <tr v-for="(value,setting,index) in orderedByKey(evaluation.settings)" :key="setting" capitalize :class="index % 2 == 0 ? 'bg-gray-100': 'bg-white'">
+            <td class=" py-1 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+              {{ setting }}
+            </td>
+            <td class=" px-3 p1-4 text-right text-sm text-gray-700">
+              {{ value }}
+            </td>
+          </tr>
+          <tr v-for="(value,setting,index) in orderedByKey(evaluation.evaluationResult.runtimeStats)" :key="setting" capitalize :class="(Object.keys(evaluation.settings).length + index) % 2 == 0 ? 'bg-gray-100': 'bg-white'">
+            <td class=" py-1 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+              {{ setting }}
+            </td>
+            <td class=" px-3 p1-4 text-right text-sm text-gray-700">
+              {{ value.toFixed(2) }}s
+            </td>
+          </tr>
 
-            <!-- More people... -->
-          </tbody>
-        </table>
-      </div>
+          <!-- More people... -->
+        </tbody>
+      </table>
     </li>
   </div>
 </template>

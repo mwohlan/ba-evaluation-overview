@@ -1,11 +1,12 @@
 import { initializeApp } from '@firebase/app'
 import type { Firestore } from '@firebase/firestore'
 import { getFirestore } from '@firebase/firestore'
-import config from '#config'
+import { useRuntimeConfig } from '#nitro'
 
 let db: Firestore
 
 if (!db) {
+  const config = useRuntimeConfig()
   initializeApp({
     apiKey: config.API_KEY,
     authDomain: config.AUTH_DOMAIN,
