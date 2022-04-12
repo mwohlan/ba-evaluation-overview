@@ -1,7 +1,6 @@
 import { initializeApp } from '@firebase/app'
 import type { Firestore } from '@firebase/firestore'
 import { getFirestore } from '@firebase/firestore'
-import { useRuntimeConfig } from '#nitro'
 
 let db: Firestore
 

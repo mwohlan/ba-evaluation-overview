@@ -1,8 +1,4 @@
 import { defineNuxtConfig } from 'nuxt3'
-import presetUno from '@unocss/preset-uno'
-import presetIcons from '@unocss/preset-icons'
-import presetAttributify from '@unocss/preset-attributify'
-import presetWebFonts from '@unocss/preset-web-fonts'
 
 export default defineNuxtConfig({
   // meta: {
@@ -37,22 +33,19 @@ export default defineNuxtConfig({
     APP_ID: process.env.APP_ID,
   },
   unocss: {
-    presets: [
-      presetUno(),
-      presetIcons({
-        scale: 1.2,
-      }),
-      presetAttributify(),
-      presetWebFonts({
-        provider: 'google',
-        fonts: {
-          openSans: 'Open Sans:200,300,400,500,600,700,800,900',
-          mulish: 'Mulish:200,300,400,500,600,700,800,900',
-          sourceSansPro: 'Source Sans Pro:200,300,400,500,600,700,800,900',
-        },
-      }),
-
-    ],
+    webFonts: {
+      provider: 'google',
+      fonts: {
+        openSans: 'Open Sans:200,300,400,500,600,700,800,900',
+        mulish: 'Mulish:200,300,400,500,600,700,800,900',
+        sourceSansPro: 'Source Sans Pro:200,300,400,500,600,700,800,900',
+      },
+    },
+    uno: true,
+    icons: {
+      scale: 1.2,
+    },
+    attributify: true,
     preflight: true,
     shortcuts: [
       ['btn', 'px-4 py-1 rounded inline-block bg-teal-600 text-white cursor-pointer hover:bg-teal-700 disabled:cursor-default disabled:bg-gray-600 disabled:opacity-50'],

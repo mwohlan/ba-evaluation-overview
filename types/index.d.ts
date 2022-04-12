@@ -126,6 +126,9 @@ export interface Question {
   id: number
   nGrams: string[]
   additionalWords: string[]
+  wordAlternatives: Record<string, string[]>
+  originalQuestion: string
+  formattedQuestion: string
   evaluationId: string
   created: Timestamp
   matchedItems: string[]

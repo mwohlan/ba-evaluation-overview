@@ -6,15 +6,15 @@
     "start": "node .output/server/index.mjs"
   },
   "dependencies": {
-    "@iconify/json": "^ 2.1.25",
+    "@iconify/json": "^ 2.1.27",
     "pinia": "^2.0.13"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.20.2",
     "@pinia/nuxt": "^0.1.8",
-    "@unocss/nuxt": "^0.30.12",
+    "@unocss/nuxt": "^0.31.0",
     "@vueuse/nuxt": "^8.2.5",
-    "eslint": "^8.12.0",
+    "eslint": "^8.13.0",
     "firebase": "^9.6.10",
     "nuxt3": "latest",
     "typescript": "^4.6.3",

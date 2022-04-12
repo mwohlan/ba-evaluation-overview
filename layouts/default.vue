@@ -16,7 +16,7 @@ definePageMeta({
 
 /* width */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 5px;
 }
 
 /* Handle */

@@ -14,7 +14,7 @@ const db = useFirestore()
 //   return snapshot.docs.map(doc => doc.data())
 // })
 const { data: evaluations } = await useLazyFetch<Evaluation[]>('/api/evaluationData')
-const sortedEvaluations = computed(() => evaluations.value?.sort((a, z) => z.evaluationResult.avgFScore - a.evaluationResult.avgFScore).reverse())
+const sortedEvaluations = computed(() => evaluations.value?.sort((a, z) => a.created.seconds - z.created.seconds).reverse())
 
 definePageMeta({
   layout: 'default',
@@ -30,25 +30,25 @@ definePageMeta({
 </script>
 
 <template>
-  <div class="p-5 flex justify-center overflow-hidden">
+  <div class="py-2 sm:py-5 flex justify-center overflow-hidden">
     <div container flex flex-col items-center>
       <div text-2xl font-bold mb-10>
         Evaluations Overview
       </div>
-      <ul flex gap-y-6 flex-col max-w-3xl w-screen px-4>
-        <div v-for="evaluation in sortedEvaluations" :key="evaluation.firestoreId" hover="ring-2 ring-gray-400" px-3 py-2 shadow-md bg-white rounded-md>
+      <ul flex gap-y-6 flex-col max-w-3xl w-screen px-2 sm:px-4>
+        <div v-for="evaluation in sortedEvaluations" :key="evaluation.firestoreId" ring ring-gray-400 px-3 py-2 shadow-md bg-white rounded-md>
           <div flex justify-between>
-            <NuxtLink text-gray-600 hover:text-gray-800 flex items-center gap-x-2 :to="{name:'evaluation-evaluationId',params:{evaluationId: evaluation.firestoreId }}">
+            <div text-gray-900 font-semibold text-sm>
+              Avg. fScore: {{ evaluation.evaluationResult.avgFScore.toFixed(3) }}
+            </div>
+            <NuxtLink text-gray-600 hover:text-gray-800 flex items-center gap-x-2 :to="{name:'questionResult-evaluationId',params:{evaluationId: evaluation.firestoreId }}">
               <div h-5 w-5 i-bi:folder-symlink />
               <div text-sm font-semibold>
                 Question Results
               </div>
             </NuxtLink>
-            <div text-gray-900 font-semibold text-sm w-fit ml-auto>
-              Avg. fScore: {{ evaluation.evaluationResult.avgFScore.toFixed(3) }}
-            </div>
           </div>
-          <div mx-auto text-gray-600 w-fit text-lg font-semibold>
+          <div mx-auto text-gray-600 mt-1 w-fit text-lg font-semibold>
             Training Config
           </div>
           <li flex>
