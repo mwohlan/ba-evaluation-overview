@@ -6,6 +6,24 @@ const route = useRoute()
 
 const { data: questions } = await useLazyFetch<Question[]>('/api/questionsData', { params: route.params })
 const { data: questionResults, pending } = await useLazyFetch<QuestionResult[]>('/api/questionResultData', { params: route.params })
+const numberOfResults = ref(5)
+
+const target = ref(null)
+
+const { stop } = useIntersectionObserver(
+  target,
+  ([{ isIntersecting }], observerElement) => {
+    if (isIntersecting)
+      numberOfResults.value += 10
+  },
+  {
+    rootMargin: '200px',
+  },
+)
+
+onUnmounted(() => {
+  stop()
+})
 
 const wordAlternatives = (question: Question) => {
   const wordAlternatives = []
@@ -39,7 +57,7 @@ definePageMeta({
 
         <ul gap-y-4 flex flex-col max-w-3xl w-screen px-2 sm:px-4>
           <div v-if="pending" self-center text-gray-700 w-14 h-14 i-eos-icons:loading />
-          <li v-for="questionResult in questionResults.sort((a,z) => a.id - z.id)" v-else :key="questionResult.evaluationId" ring ring-gray-400 px-3 py-2 space-y-4 w-full shadow-md bg-white rounded-md>
+          <li v-for="questionResult in questionResults.sort((a,z) => a.id - z.id).slice(0,numberOfResults)" v-else :key="questionResult.evaluationId" ring ring-gray-400 px-3 py-2 space-y-4 w-full shadow-md bg-white rounded-md>
             <div flex justify-between>
               <NuxtLink text-gray-600 hover:text-gray-800 flex items-center gap-x-2 :to="{name:'index'}">
                 <div h-5 w-5 i-ic:outline-arrow-back />
@@ -54,13 +72,13 @@ definePageMeta({
                 </div>
               </NuxtLink>
             </div>
-            <div flex flex-col flex-1 class=" mt-">
+            <div flex flex-col flex-1>
               <div mx-auto w-fit text-gray-700 text-lg font-semibold>
                 Info
               </div>
 
               <div border-gray-300 border-2>
-                <div class="flex gap-x-2 justify-between py-1 px-3 bg-white">
+                <div class="flex gap-x-2 justify-between py-1 sm:px-6 px-3 bg-white">
                   <div class=" text-sm font-medium text-gray-900">
                     Question
                   </div>
@@ -68,7 +86,7 @@ definePageMeta({
                     {{ questionResult.originalQuestion }}
                   </div>
                 </div>
-                <div class="flex justify-between py-1 px-3 bg-gray-100 ">
+                <div class="flex justify-between py-1 sm:px-6 px-3 bg-gray-100 ">
                   <div class=" text-sm font-medium text-gray-900">
                     id
                   </div>
@@ -76,7 +94,7 @@ definePageMeta({
                     {{ questionResult.id }}
                   </div>
                 </div>
-                <div class="flex justify-between py-1 px-3 bg-white ">
+                <div class="flex justify-between py-1 sm:px-6 px-3 bg-white ">
                   <div class=" text-sm font-medium text-gray-900">
                     fScore
                   </div>
@@ -85,7 +103,7 @@ definePageMeta({
                   </div>
                 </div>
 
-                <div class="flex gap-x-2 justify-between py-1 px-3 bg-gray-100">
+                <div class="flex gap-x-2 justify-between py-1 sm:px-6 px-3 bg-gray-100">
                   <div class=" text-sm font-medium text-gray-900">
                     Bench Resources
                   </div>
@@ -100,7 +118,7 @@ definePageMeta({
                     </NuxtLink>
                   </div>
                 </div>
-                <div class="flex gap-x-2  justify-between py-1 px-3 bg-white">
+                <div class="flex gap-x-2  justify-between py-1 sm:px-6 px-3 bg-white">
                   <div class=" text-sm font-medium text-gray-900">
                     Matched Resources
                   </div>
@@ -117,10 +135,7 @@ definePageMeta({
                     </NuxtLink>
                   </div>
                 </div>
-                <ShowData bg-gray-100 :values="questions.find(question => question.id === questionResult.id).additionalWords" :name="'Additional Words'" />
-                <ShowData :values="wordAlternatives(questions.find(question => question.id === questionResult.id))" :name="'Word Alternatives'" />
-                <ShowData bg-gray-100 :values="questions.find(question => question.id === questionResult.id).nGrams" :name="'Ngrams'" />
-                <div class="flex gap-x-2 justify-between py-1 px-3 bg-white">
+                <div class="flex gap-x-2 justify-between py-1 sm:px-6 px-3 bg-gray-100">
                   <div class=" text-sm font-medium text-gray-900">
                     Fail Reasons
                   </div>
@@ -128,7 +143,7 @@ definePageMeta({
                     {{ questionResult.likelyFailReasons.length >0 ? questionResult.likelyFailReasons.join(', ') : 'None' }}
                   </div>
                 </div>
-                <div class="flex gap-x-3 justify-between py-1 px-3 bg-gray-100">
+                <div class="flex gap-x-3 justify-between py-1 sm:px-6 px-3 bg-gray-white">
                   <div class="flex-shrink-0 text-sm font-medium text-gray-900">
                     Bench Query
                   </div>
@@ -136,7 +151,10 @@ definePageMeta({
                     {{ questionResult.benchQuery }}
                   </div>
                 </div>
-                <ShowAnswers bg-gray-100 pt-2 :values="questionResult.benchAnswers" />
+                <ShowAnswers bg-white pt-2 :values="questionResult.benchAnswers" />
+                <ShowData bg-gray-100 :values="questions.find(question => question.id === questionResult.id).additionalWords" :name="'Additional Words'" />
+                <ShowData :values="wordAlternatives(questions.find(question => question.id === questionResult.id))" :name="'Word Alternatives'" />
+                <ShowData bg-gray-100 :values="questions.find(question => question.id === questionResult.id).nGrams" :name="'Ngrams'" />
               </div>
 
               <!-- More people... -->
@@ -163,6 +181,7 @@ definePageMeta({
             </div>
           </li>
         </ul>
+        <div v-if="!pending" ref="target" />
       </div>
     </div>
   </div>

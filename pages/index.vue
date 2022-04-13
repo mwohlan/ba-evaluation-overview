@@ -13,8 +13,27 @@ const db = useFirestore()
 //   const snapshot = await getDocs(collectionRef)
 //   return snapshot.docs.map(doc => doc.data())
 // })
-const { data: evaluations } = await useLazyFetch<Evaluation[]>('/api/evaluationData')
-const sortedEvaluations = computed(() => evaluations.value?.sort((a, z) => a.created.seconds - z.created.seconds).reverse())
+const { data: evaluations, pending } = await useLazyFetch<Evaluation[]>('/api/evaluationData')
+const sortedEvaluations = computed(() => evaluations.value?.sort((a, z) => a.created.seconds - z.created.seconds).reverse().slice(0, 10))
+
+const numberOfResults = ref(5)
+
+const target = ref(null)
+
+const { stop } = useIntersectionObserver(
+  target,
+  ([{ isIntersecting }], observerElement) => {
+    if (isIntersecting)
+      numberOfResults.value += 10
+  },
+  {
+    rootMargin: '200px',
+  },
+)
+
+onUnmounted(() => {
+  stop()
+})
 
 definePageMeta({
   layout: 'default',
@@ -36,7 +55,7 @@ definePageMeta({
         Evaluations Overview
       </div>
       <ul flex gap-y-6 flex-col max-w-3xl w-screen px-2 sm:px-4>
-        <div v-for="evaluation in sortedEvaluations" :key="evaluation.firestoreId" ring ring-gray-400 px-3 py-2 shadow-md bg-white rounded-md>
+        <div v-for="evaluation in sortedEvaluations.slice(0,numberOfResults)" :key="evaluation.firestoreId" ring ring-gray-400 px-3 py-2 shadow-md bg-white rounded-md>
           <div flex justify-between>
             <div text-gray-900 font-semibold text-sm>
               Avg. fScore: {{ evaluation.evaluationResult.avgFScore.toFixed(3) }}
@@ -120,6 +139,7 @@ definePageMeta({
           </div>
         </div>
       </ul>
+      <div v-if="!pending" ref="target" />
     </div>
   </div>
 </template>

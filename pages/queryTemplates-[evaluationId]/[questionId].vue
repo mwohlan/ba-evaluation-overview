@@ -5,6 +5,25 @@ import orderedByKey from '../../utility/ordered'
 const route = useRoute()
 const { data: queryTemplates, pending } = await useLazyFetch<QueryTemplate[]>('/api/queryTemplateData', { params: route.params })
 
+const numberOfResults = ref(5)
+
+const target = ref(null)
+
+const { stop } = useIntersectionObserver(
+  target,
+  ([{ isIntersecting }], observerElement) => {
+    if (isIntersecting)
+      numberOfResults.value += 10
+  },
+  {
+    rootMargin: '200px',
+  },
+)
+
+onUnmounted(() => {
+  stop()
+})
+
 definePageMeta({
   layout: 'default',
   pageTransition: {
@@ -27,7 +46,7 @@ definePageMeta({
         <div v-if="pending" self-center text-gray-700 w-14 h-14 i-eos-icons:loading />
 
         <ul v-else gap-y-4 flex flex-col max-w-3xl w-screen px-2 sm:px-4>
-          <li v-for="(queryTemplate, index) in queryTemplates.sort((a,z) => z.totalScore.normalizedWeighted - a.totalScore.normalizedWeighted)" :key="queryTemplate.answers[0].query" px-3 py-2 space-y-4 w-full shadow-md bg-white rounded-md>
+          <li v-for="(queryTemplate, index) in queryTemplates.sort((a,z) => z.totalScore.normalizedWeighted - a.totalScore.normalizedWeighted).slice(0,numberOfResults)" :key="queryTemplate.answers[0].query" px-3 py-2 space-y-4 w-full shadow-md bg-white rounded-md>
             <div flex justify-between>
               <NuxtLink text-gray-600 hover:text-gray-800 flex items-center gap-x-2 :to="{name:'questionResult-evaluationId',params:{evaluationId: queryTemplate.evaluationId}}">
                 <div h-5 w-5 i-ic:outline-arrow-back />
@@ -45,7 +64,7 @@ definePageMeta({
               </div>
 
               <div border-gray-300 border-2>
-                <div class="flex gap-x-2 justify-between py-1 px-3 bg-gray-100">
+                <div class="flex gap-x-2 justify-between py-1 sm:px-6 px-3 bg-gray-100">
                   <div class=" text-sm font-medium text-gray-900">
                     Type
                   </div>
@@ -54,7 +73,7 @@ definePageMeta({
                   </div>
                 </div>
 
-                <div class="flex gap-x-2 justify-between py-1 px-3 bg-white">
+                <div class="flex gap-x-2 justify-between py-1 sm:px-6 px-3 bg-white">
                   <div class=" text-sm font-medium text-gray-900">
                     Query Scores
                   </div>
@@ -69,7 +88,7 @@ definePageMeta({
                     </div>
                   </div>
                 </div>
-                <div class="flex gap-x-2 justify-between py-1 px-3 bg-gray-100">
+                <div class="flex gap-x-2 justify-between py-1 sm:px-6 px-3 bg-gray-100">
                   <div class=" text-sm font-medium text-gray-900">
                     Total Score
                   </div>
@@ -77,7 +96,7 @@ definePageMeta({
                     {{ queryTemplate.totalScore.normalizedWeighted.toFixed(3) }}
                   </div>
                 </div>
-                <div class="flex gap-x-2 justify-between py-1 px-3 bg-white">
+                <div class="flex gap-x-2 justify-between py-1 sm:px-6 px-3 bg-white">
                   <div class=" text-sm font-medium text-gray-900">
                     Resources
                   </div>
@@ -112,6 +131,7 @@ definePageMeta({
             </div>
           </li>
         </ul>
+        <div v-if="!pending" ref="target" />
       </div>
     </div>
   </div>
