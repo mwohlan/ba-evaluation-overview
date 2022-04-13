@@ -3,6 +3,7 @@ import type { Question, QuestionResult } from '../../types'
 import orderedByKey from '../../utility/ordered'
 
 const route = useRoute()
+const router = useRouter()
 
 const { data: questions } = await useLazyFetch<Question[]>('/api/questionsData', { params: route.params })
 const { data: questionResults, pending } = await useLazyFetch<QuestionResult[]>('/api/questionResultData', { params: route.params })
@@ -55,9 +56,9 @@ definePageMeta({
           Question Results
         </div>
 
-        <ul gap-y-4 flex flex-col max-w-3xl w-screen px-2 sm:px-4>
+        <ul id="list" gap-y-4 flex flex-col max-w-3xl w-screen px-2 sm:px-4>
           <div v-if="pending" self-center text-gray-700 w-14 h-14 i-eos-icons:loading />
-          <li v-for="questionResult in questionResults.sort((a,z) => a.id - z.id).slice(0,numberOfResults)" v-else :key="questionResult.evaluationId" ring ring-gray-400 px-3 py-2 space-y-4 w-full shadow-md bg-white rounded-md>
+          <li v-for="questionResult in questionResults.sort((a,z) => a.id - z.id).slice(0,numberOfResults)" v-else :key="questionResult.evaluationId" ring ring-gray-400 sm:px-4 px-2 py-2 space-y-4 w-full shadow-md bg-white rounded-md>
             <div flex justify-between>
               <NuxtLink text-gray-600 hover:text-gray-800 flex items-center gap-x-2 :to="{name:'index'}">
                 <div h-5 w-5 i-ic:outline-arrow-back />
@@ -78,39 +79,39 @@ definePageMeta({
               </div>
 
               <div border-gray-300 border-2>
-                <div class="flex gap-x-2 justify-between py-1 sm:px-6 px-3 bg-white">
-                  <div class=" text-sm font-medium text-gray-900">
+                <div class="flex gap-x-2 justify-between items-center py-1 sm:px-6 px-3 bg-white">
+                  <div class=" text-sm font-semibold text-gray-700">
                     Question
                   </div>
-                  <div class="text-sm text-gray-700">
+                  <div class="text-sm font-medium text-gray-700">
                     {{ questionResult.originalQuestion }}
                   </div>
                 </div>
-                <div class="flex justify-between py-1 sm:px-6 px-3 bg-gray-100 ">
-                  <div class=" text-sm font-medium text-gray-900">
-                    id
+                <div class="flex justify-between items-center py-1 sm:px-6 px-3 bg-gray-100 ">
+                  <div class=" text-sm font-semibold text-gray-700">
+                    Id
                   </div>
-                  <div class="text-sm text-gray-700">
+                  <div class="text-sm font-medium text-gray-700">
                     {{ questionResult.id }}
                   </div>
                 </div>
-                <div class="flex justify-between py-1 sm:px-6 px-3 bg-white ">
-                  <div class=" text-sm font-medium text-gray-900">
-                    fScore
+                <div class="flex justify-between items-center py-1 sm:px-6 px-3 bg-white ">
+                  <div class=" text-sm font-semibold text-gray-700">
+                    Fscore
                   </div>
-                  <div class="text-sm text-gray-700">
+                  <div class="text-sm font-medium text-gray-700">
                     {{ questionResult.fScore.toFixed(3) }}
                   </div>
                 </div>
 
-                <div class="flex gap-x-2 justify-between py-1 sm:px-6 px-3 bg-gray-100">
-                  <div class=" text-sm font-medium text-gray-900">
+                <div class="flex gap-x-2 justify-between items-center py-1 sm:px-6 px-3 bg-gray-100">
+                  <div class=" text-sm font-semibold text-gray-700">
                     Bench Resources
                   </div>
                   <div flex-1 flex flex-wrap justify-end gap-x-1>
                     <NuxtLink
                       v-for="(resource,index) in questionResult.benchResources.sort()" :key="resource" flex
-                      items-center class="text-sm gap-x-0.5 text-gray-700" :to="`https://www.wikidata.org/wiki/Special:EntityData/${resource.split(' ')[0]}`" target="_blank"
+                      items-center class="text-sm gap-x-0.5 font-medium text-gray-700" :to="`https://www.wikidata.org/wiki/Special:EntityData/${resource.split(' ')[0]}`" target="_blank"
                     >
                       <div>{{ resource }}</div>
                       <div class="h-3 w-3" i-ri:external-link-line />
@@ -118,8 +119,8 @@ definePageMeta({
                     </NuxtLink>
                   </div>
                 </div>
-                <div class="flex gap-x-2  justify-between py-1 sm:px-6 px-3 bg-white">
-                  <div class=" text-sm font-medium text-gray-900">
+                <div class="flex gap-x-2  justify-between items-center py-1 sm:px-6 px-3 bg-white">
+                  <div class=" text-sm font-semibold text-gray-700">
                     Matched Resources
                   </div>
                   <div flex-1 flex flex-wrap justify-end gap-x-1>
@@ -127,7 +128,7 @@ definePageMeta({
                       v-for="(resource,index) in questionResult.resources.filter(resource =>
                         resource.name !== 'Variable').sort()"
                       :key="resource.name" flex
-                      items-center class="text-sm gap-x-0.5  text-gray-700" :to="`https://www.wikidata.org/wiki/Special:EntityData/${resource.name.split(' ')[0]}`" target="_blank"
+                      items-center class="text-sm gap-x-0.5 font-medium text-gray-700" :to="`https://www.wikidata.org/wiki/Special:EntityData/${resource.name.split(' ')[0]}`" target="_blank"
                     >
                       <div>{{ resource.name }}</div>
                       <div class="h-3 w-3" i-ri:external-link-line />
@@ -135,19 +136,19 @@ definePageMeta({
                     </NuxtLink>
                   </div>
                 </div>
-                <div class="flex gap-x-2 justify-between py-1 sm:px-6 px-3 bg-gray-100">
-                  <div class=" text-sm font-medium text-gray-900">
+                <div class="flex gap-x-2 justify-between items-center py-1 sm:px-6 px-3 bg-gray-100">
+                  <div class=" text-sm font-semibold text-gray-700">
                     Fail Reasons
                   </div>
-                  <div class="text-sm text-gray-700">
+                  <div class="text-sm font-medium text-gray-700">
                     {{ questionResult.likelyFailReasons.length >0 ? questionResult.likelyFailReasons.join(', ') : 'None' }}
                   </div>
                 </div>
-                <div class="flex gap-x-3 justify-between py-1 sm:px-6 px-3 bg-gray-white">
-                  <div class="flex-shrink-0 text-sm font-medium text-gray-900">
+                <div class="flex gap-x-3 justify-between items-center py-1 sm:px-6 px-3 bg-gray-white">
+                  <div class="flex-shrink-0 text-sm font-semibold text-gray-700">
                     Bench Query
                   </div>
-                  <div class="text-sm text-gray-700">
+                  <div class="text-sm font-medium text-gray-700">
                     {{ questionResult.benchQuery }}
                   </div>
                 </div>

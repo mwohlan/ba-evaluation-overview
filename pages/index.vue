@@ -19,7 +19,7 @@ const sortedEvaluations = computed(() => evaluations.value?.sort((a, z) => a.cre
 const numberOfResults = ref(5)
 
 const target = ref(null)
-
+const list = ref(null)
 const { stop } = useIntersectionObserver(
   target,
   ([{ isIntersecting }], observerElement) => {
@@ -54,10 +54,10 @@ definePageMeta({
       <div text-2xl font-bold mb-10>
         Evaluations Overview
       </div>
-      <ul flex gap-y-6 flex-col max-w-3xl w-screen px-2 sm:px-4>
-        <div v-for="evaluation in sortedEvaluations.slice(0,numberOfResults)" :key="evaluation.firestoreId" ring ring-gray-400 px-3 py-2 shadow-md bg-white rounded-md>
+      <ul v-if="!pending" flex gap-y-6 flex-col max-w-3xl w-screen px-2 sm:px-4>
+        <div v-for="evaluation in sortedEvaluations.slice(0,numberOfResults)" :key="evaluation.firestoreId" ring ring-gray-400 sm:px-4 px-2 py-2 shadow-md bg-white rounded-md>
           <div flex justify-between>
-            <div text-gray-900 font-semibold text-sm>
+            <div text-gray-700 font-semibold text-sm>
               Avg. fScore: {{ evaluation.evaluationResult.avgFScore.toFixed(3) }}
             </div>
             <NuxtLink text-gray-600 hover:text-gray-800 flex items-center gap-x-2 :to="{name:'questionResult-evaluationId',params:{evaluationId: evaluation.firestoreId }}">
@@ -75,10 +75,10 @@ definePageMeta({
               <tbody class="bg-white">
                 <!-- Odd row -->
                 <tr v-for="(value,type,index) in orderedByKey(evaluation.trainingConfig)" :key="type" capitalize :class="index % 2 == 0 ? 'bg-gray-100': 'bg-white'">
-                  <td class="py-1 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                  <td class="py-1 pl-4 pr-3 text-sm font-semibold text-gray-700 sm:pl-6">
                     {{ type === "trainingfScoreThreshold" ? "fScoreThreshold" : type }}
                   </td>
-                  <td class=" px-3 pl-4 text-right text-sm text-gray-700">
+                  <td class=" px-3 pl-4 text-right text-sm font-medium text-gray-700">
                     {{ value }}
                   </td>
                 </tr>
@@ -95,10 +95,10 @@ definePageMeta({
               <tbody class="bg-white">
                 <!-- Odd row -->
                 <tr v-for="(metric,index) in evaluation.metricConfigs" :key="metric.name" :class="index % 2 == 0 ? 'bg-gray-100': 'bg-white'">
-                  <td class="py-1 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                  <td class="py-1 pl-4 pr-3 text-sm font-semibold text-gray-700 sm:pl-6">
                     {{ metric.name }}
                   </td>
-                  <td class="whitespace-nowrap px-3 p1-4 text-right text-sm text-gray-700">
+                  <td class="whitespace-nowrap px-3 pl-4 font-medium text-right text-sm text-gray-700">
                     {{ metric.weight.toFixed(3) }}
                   </td>
                 </tr>
@@ -115,7 +115,7 @@ definePageMeta({
               <tbody class="bg-white">
                 <!-- Odd row -->
                 <tr v-for="(modules,type,index) in orderedByKey(evaluation.nlpConfig)" :key="type" capitalize :class="index % 2 == 0 ? 'bg-gray-100': 'bg-white'">
-                  <td class="py-1 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                  <td class="py-1 pl-4 pr-3 text-sm font-semibold text-gray-700 sm:pl-6">
                     {{ type }}
                   </td>
                   <td class="px-3 p1-4 text-right font-medium text-sm text-gray-700">
@@ -129,7 +129,7 @@ definePageMeta({
           </li>
           <RuntimeStats mt-2 :evaluation="evaluation" />
           <div class="flex mt-2 justify-end">
-            <div text-gray-900 flex items-center gap-x-1>
+            <div text-gray-700 flex items-center gap-x-1>
               <div i-ic:baseline-access-time />
 
               <div text-sm font-semibold>
