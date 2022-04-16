@@ -5,8 +5,6 @@ import orderedByKey from '../../utility/ordered'
 const route = useRoute()
 const { data: queryTemplates, pending } = await useLazyFetch<QueryTemplate[]>('/api/queryTemplateData', { params: route.params })
 
-const numberOfResults = ref(5)
-
 const activeSortField = ref<ActiveSortField>({ field: 'rank', direction: 'desc' })
 
 const intersectionTarget = ref(null)
@@ -40,6 +38,18 @@ definePageMeta({
         </div>
         <SortCollection :keys="Object.keys(sortFunctions)" :toggle-active-sort-field="toggleActiveSortField" :active-sort-field="activeSortField" />
         <div v-if="pending" self-center text-gray-700 w-14 h-14 i-eos-icons:loading />
+        <div v-else-if="sortedQueryTemplates.length == 0" px-3 py-2 flex gap-x-3 items-center bg-gray-300 rounded mt-4>
+          <div i-icon-park-outline:caution h-8 w-8 text-yellow-600 />
+          <div text-sm font-semibold text-gray-700>
+            No query templates with fScore > 0 found
+            <NuxtLink w-fit ml-auto mt-2 text-gray-600 hover:text-gray-800 flex items-center gap-x-2 :to="{name:'questionResult-evaluationId',params:{evaluationId: route.params.evaluationId}}">
+              <div h-5 w-5 i-ic:outline-arrow-back />
+              <div text-sm font-semibold>
+                Back
+              </div>
+            </NuxtLink>
+          </div>
+        </div>
 
         <ul v-else id="list" gap-y-4 flex flex-col max-w-3xl w-screen px-2 sm:px-4>
           <li v-for="(queryTemplate, index) in sortedQueryTemplates" :key="queryTemplate.answers[0].query" px-2 sm:px-4 py-2 space-y-4 w-full shadow-md bg-white rounded-md>
@@ -120,7 +130,7 @@ definePageMeta({
                         </div>
                         <template #popper>
                           <div v-for="resourceScore in resource.resourceScores" :key="resourceScore.score" text-gray-700 font-medium text-sm>
-                            {{ resourceScore.metric }}: {{ resourceScore.score.toFixed(3) }}{{` ( ${resourceScore.normalizer} )`}}
+                            {{ resourceScore.metric }}: {{ resourceScore.score.toFixed(3) }}{{ ` ( ${resourceScore.normalizer} )` }}
                           </div>
                         </template>
                       </VTooltip>
