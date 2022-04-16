@@ -1,30 +1,23 @@
 <script lang="ts" setup>
-import type { Question, QuestionResult } from '../../types'
+import type { ActiveSortField, Question, QuestionResult } from '../../types'
 import orderedByKey from '../../utility/ordered'
 
 const route = useRoute()
-const router = useRouter()
 
 const { data: questions } = await useLazyFetch<Question[]>('/api/questionsData', { params: route.params })
 const { data: questionResults, pending } = await useLazyFetch<QuestionResult[]>('/api/questionResultData', { params: route.params })
-const numberOfResults = ref(5)
 
-const target = ref(null)
+const activeSortField = ref<ActiveSortField>({ field: 'id', direction: 'asc' })
 
-const { stop } = useIntersectionObserver(
-  target,
-  ([{ isIntersecting }], observerElement) => {
-    if (isIntersecting)
-      numberOfResults.value += 10
-  },
-  {
-    rootMargin: '200px',
-  },
-)
+const intersectionTarget = ref(null)
 
-onUnmounted(() => {
-  stop()
-})
+const sortFunctions = {
+  id: (questionResults: QuestionResult[]) => questionResults.sort((a, z) => z.id - a.id),
+  fScore: (questionResults: QuestionResult[]) => questionResults.sort((a, z) => z.fScore - a.fScore),
+
+}
+const { sortedCollection: sortedQuestionResults, toggleActiveSortField }
+= useSortedCollection(questionResults, sortFunctions, activeSortField, ref(5), intersectionTarget)
 
 const wordAlternatives = (question: Question) => {
   const wordAlternatives = []
@@ -52,13 +45,14 @@ definePageMeta({
   <div>
     <div class="py-2 sm:py-5 flex justify-center overflow-hidden">
       <div container flex flex-col items-center>
-        <div text-2xl font-bold mb-10>
+        <div text-2xl font-bold mb-2 sm:mb-5>
           Question Results
         </div>
+        <SortCollection :keys="Object.keys(sortFunctions)" :toggle-active-sort-field="toggleActiveSortField" :active-sort-field="activeSortField" />
 
         <ul id="list" gap-y-4 flex flex-col max-w-3xl w-screen px-2 sm:px-4>
           <div v-if="pending" self-center text-gray-700 w-14 h-14 i-eos-icons:loading />
-          <li v-for="questionResult in questionResults.sort((a,z) => a.id - z.id).slice(0,numberOfResults)" v-else :key="questionResult.evaluationId" ring ring-gray-400 sm:px-4 px-2 py-2 space-y-4 w-full shadow-md bg-white rounded-md>
+          <li v-for="questionResult in sortedQuestionResults" v-else :key="questionResult.evaluationId" ring ring-gray-400 sm:px-4 px-2 py-2 space-y-4 w-full shadow-md bg-white rounded-md>
             <div flex justify-between>
               <NuxtLink text-gray-600 hover:text-gray-800 flex items-center gap-x-2 :to="{name:'index'}">
                 <div h-5 w-5 i-ic:outline-arrow-back />
@@ -174,7 +168,7 @@ definePageMeta({
 
               <!-- More people... -->
             </div>
-            <div class="flex justify-end items-center gap-x-2">
+            <div class="flex justify-end items-center gap-x-2 text-gray-700">
               <div i-ic:baseline-access-time />
               <div text-sm font-semibold>
                 {{ new Date(questionResults[0].created.seconds * 1000 ).toLocaleString("en-US",{dateStyle:'medium',timeStyle:'medium',hourCycle:'h24'}) }}
@@ -182,7 +176,7 @@ definePageMeta({
             </div>
           </li>
         </ul>
-        <div v-if="!pending" ref="target" />
+        <div v-if="!pending" ref="intersectionTarget" />
       </div>
     </div>
   </div>

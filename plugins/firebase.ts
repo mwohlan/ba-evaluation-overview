@@ -15,6 +15,8 @@ export default defineNuxtPlugin(() => {
   const db = getFirestore() as Firestore
 
   return {
-    provide: db,
+    provide: {
+      db,
+    },
   }
 })

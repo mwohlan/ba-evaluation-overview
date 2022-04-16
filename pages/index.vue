@@ -1,39 +1,21 @@
 <script lang="ts" setup>
-import type { CollectionReference } from 'firebase/firestore'
-import { collection, getDocs } from 'firebase/firestore'
-import useFirestore from '../composables/useFirestore'
-import type { Evaluation } from '../types'
+import type { ActiveSortField, Evaluation, SortFunctions } from '../types'
 import orderedByKey from '../utility/ordered'
 import RuntimeStats from '~~/components/RuntimeStats.vue'
-const db = useFirestore()
+import useSortedCollection from '~~/composables/useSortedCollection'
 
-// const { data: evaluations } = await useFetch('/api/evaluationData', { lazy: true })
-// const { data: evaluations } = await useLazyAsyncData<Evaluation[]> ('evaluations', async() => {
-//   const collectionRef = collection(db, 'evaluations') as CollectionReference<Evaluation>
-//   const snapshot = await getDocs(collectionRef)
-//   return snapshot.docs.map(doc => doc.data())
-// })
 const { data: evaluations, pending } = await useLazyFetch<Evaluation[]>('/api/evaluationData')
-const sortedEvaluations = computed(() => evaluations.value?.sort((a, z) => a.created.seconds - z.created.seconds).reverse().slice(0, 10))
+const activeSortField = ref<ActiveSortField>({ field: 'created', direction: 'desc' })
 
-const numberOfResults = ref(5)
+const sortFunctions: SortFunctions = {
+  created: (evaluations: Evaluation[]) => evaluations.sort((a, z) => z.created.seconds - a.created.seconds),
+  fScore: (evaluations: Evaluation[]) => evaluations.sort((a, z) => z.evaluationResult.avgFScore - a.evaluationResult.avgFScore),
 
-const target = ref(null)
-const list = ref(null)
-const { stop } = useIntersectionObserver(
-  target,
-  ([{ isIntersecting }], observerElement) => {
-    if (isIntersecting)
-      numberOfResults.value += 10
-  },
-  {
-    rootMargin: '200px',
-  },
-)
+}
 
-onUnmounted(() => {
-  stop()
-})
+const intersectionTarget = ref(null)
+const { sortedCollection: sortedEvaluations, toggleActiveSortField }
+= useSortedCollection(evaluations, sortFunctions, activeSortField, ref(5), intersectionTarget)
 
 definePageMeta({
   layout: 'default',
@@ -51,11 +33,12 @@ definePageMeta({
 <template>
   <div class="py-2 sm:py-5 flex justify-center overflow-hidden">
     <div container flex flex-col items-center>
-      <div text-2xl font-bold mb-10>
+      <div text-2xl font-bold mb-2 sm:mb-5>
         Evaluations Overview
       </div>
+      <SortCollection :keys="Object.keys(sortFunctions)" :toggle-active-sort-field="toggleActiveSortField" :active-sort-field="activeSortField" />
       <ul v-if="!pending" flex gap-y-6 flex-col max-w-3xl w-screen px-2 sm:px-4>
-        <div v-for="evaluation in sortedEvaluations.slice(0,numberOfResults)" :key="evaluation.firestoreId" ring ring-gray-400 sm:px-4 px-2 py-2 shadow-md bg-white rounded-md>
+        <div v-for="evaluation in sortedEvaluations" :key="evaluation.firestoreId" ring ring-gray-400 sm:px-4 px-2 py-2 shadow-md bg-white rounded-md>
           <div flex justify-between>
             <div text-gray-700 font-semibold text-sm>
               Avg. fScore: {{ evaluation.evaluationResult.avgFScore.toFixed(3) }}
@@ -139,7 +122,7 @@ definePageMeta({
           </div>
         </div>
       </ul>
-      <div v-if="!pending" ref="target" />
+      <div v-if="!pending" ref="intersectionTarget" />
     </div>
   </div>
 </template>

@@ -1,5 +1,4 @@
 import { defineNuxtConfig } from 'nuxt3'
-
 export default defineNuxtConfig({
   // meta: {
   //   title: 'Vitesse Nuxt 3',
@@ -11,6 +10,7 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     '@unocss/nuxt',
     '@pinia/nuxt',
+    'floating-vue/nuxt',
   ],
   vueuse: {
     ssrHandlers: true,
@@ -36,9 +36,7 @@ export default defineNuxtConfig({
     webFonts: {
       provider: 'google',
       fonts: {
-        openSans: 'Open Sans:200,300,400,500,600,700,800,900',
         mulish: 'Mulish:200,300,400,500,600,700,800,900',
-        sourceSansPro: 'Source Sans Pro:200,300,400,500,600,700,800,900',
       },
     },
     uno: true,

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { QueryTemplate, Question } from '../../types'
+import type { ActiveSortField, QueryTemplate } from '../../types'
 import orderedByKey from '../../utility/ordered'
 
 const route = useRoute()
@@ -7,22 +7,17 @@ const { data: queryTemplates, pending } = await useLazyFetch<QueryTemplate[]>('/
 
 const numberOfResults = ref(5)
 
-const target = ref(null)
+const activeSortField = ref<ActiveSortField>({ field: 'rank', direction: 'desc' })
 
-const { stop } = useIntersectionObserver(
-  target,
-  ([{ isIntersecting }], observerElement) => {
-    if (isIntersecting)
-      numberOfResults.value += 10
-  },
-  {
-    rootMargin: '200px',
-  },
-)
+const intersectionTarget = ref(null)
 
-onUnmounted(() => {
-  stop()
-})
+const sortFunctions = {
+  rank: (queryTemplates: QueryTemplate[]) => queryTemplates.sort((a, z) => z.totalScore.normalizedWeighted - a.totalScore.normalizedWeighted),
+  fScore: (queryTemplates: QueryTemplate[]) => queryTemplates.sort((a, z) => Math.max(...z.answers.map(a => a.fScore)) - Math.max(...a.answers.map(a => a.fScore))),
+
+}
+const { sortedCollection: sortedQueryTemplates, toggleActiveSortField }
+= useSortedCollection(queryTemplates, sortFunctions, activeSortField, ref(5), intersectionTarget)
 
 definePageMeta({
   layout: 'default',
@@ -40,13 +35,14 @@ definePageMeta({
   <div>
     <div class="py-2 sm:py-5 flex justify-center overflow-hidden">
       <div container flex flex-col items-center>
-        <div text-2xl font-bold mb-10>
+        <div text-2xl font-bold mb-2 sm:mb-5>
           Query Templates
         </div>
+        <SortCollection :keys="Object.keys(sortFunctions)" :toggle-active-sort-field="toggleActiveSortField" :active-sort-field="activeSortField" />
         <div v-if="pending" self-center text-gray-700 w-14 h-14 i-eos-icons:loading />
 
         <ul v-else id="list" gap-y-4 flex flex-col max-w-3xl w-screen px-2 sm:px-4>
-          <li v-for="(queryTemplate, index) in queryTemplates.sort((a,z) => z.totalScore.normalizedWeighted - a.totalScore.normalizedWeighted).slice(0,numberOfResults)" :key="queryTemplate.answers[0].query" px-2 sm:px-4 py-2 space-y-4 w-full shadow-md bg-white rounded-md>
+          <li v-for="(queryTemplate, index) in sortedQueryTemplates" :key="queryTemplate.answers[0].query" px-2 sm:px-4 py-2 space-y-4 w-full shadow-md bg-white rounded-md>
             <div flex justify-between>
               <NuxtLink text-gray-600 hover:text-gray-800 flex items-center gap-x-2 :to="{name:'questionResult-evaluationId',params:{evaluationId: queryTemplate.evaluationId}}">
                 <div h-5 w-5 i-ic:outline-arrow-back />
@@ -78,13 +74,29 @@ definePageMeta({
                     Query Scores
                   </div>
                   <div class="text-sm space-y-1 font-medium text-gray-700">
-                    <div v-for="queryScore in queryTemplate.queryScores" :key="queryScore.metric" flex gap-x-3 justify-between>
-                      <div>
-                        {{ queryScore.metric.replace('Avg', '') }}:
-                      </div>
-                      <div>
-                        {{ queryScore.score.normalizedWeighted.toFixed(3) }} | {{ queryScore.score.normalized.toFixed(3) }}
-                      </div>
+                    <div v-for="queryScore in queryTemplate.queryScores" :key="queryScore.metric">
+                      <VTooltip :placement="'auto'">
+                        <div flex gap-x-3 justify-between>
+                          <div>
+                            {{ queryScore.metric.replace('Avg', '') }}:
+                          </div>
+                          <div>
+                            {{ queryScore.score.normalizedWeighted.toFixed(3) }} | {{ queryScore.score.normalized.toFixed(3) }}
+                          </div>
+                        </div>
+                        <template #popper>
+                          <div v-for="(score,key) in orderedByKey(queryScore.score)" :key="score" text-gray-700 font-medium text-sm>
+                            <div class="flex gap-x-2 justify-between">
+                              <div>
+                                {{ key }}
+                              </div>
+                              <div>
+                                {{ score.toFixed(3) }}
+                              </div>
+                            </div>
+                          </div>
+                        </template>
+                      </VTooltip>
                     </div>
                   </div>
                 </div>
@@ -102,9 +114,16 @@ definePageMeta({
                   </div>
                   <div class="text-sm space-y-1 font-medium text-gray-700">
                     <div v-for="resource in queryTemplate.resources" :key="resource.name" flex gap-x-3 justify-between>
-                      <div>
-                        {{ resource.name }}
-                      </div>
+                      <VTooltip :disabled="resource.resourceScores.length == 0">
+                        <div>
+                          {{ resource.name }}
+                        </div>
+                        <template #popper>
+                          <div v-for="resourceScore in resource.resourceScores" :key="resourceScore.score" text-gray-700 font-medium text-sm>
+                            {{ resourceScore.metric }}: {{ resourceScore.score.toFixed(3) }}{{` ( ${resourceScore.normalizer} )`}}
+                          </div>
+                        </template>
+                      </VTooltip>
                     </div>
                   </div>
                 </div>
@@ -123,7 +142,7 @@ definePageMeta({
                 <!-- More people... -->
               </div>
             </div>
-            <div class="flex mt-1 justify-end items-center gap-x-2">
+            <div class="flex mt-1 justify-end items-center gap-x-2 text-gray-700">
               <div i-ic:baseline-access-time />
               <div text-sm font-semibold>
                 {{ new Date(queryTemplate?.created?.seconds * 1000 ).toLocaleString("en-US",{dateStyle:'medium',timeStyle:'medium',hourCycle:'h24'}) }}
@@ -131,8 +150,22 @@ definePageMeta({
             </div>
           </li>
         </ul>
-        <div v-if="!pending" ref="target" />
+        <div v-if="!pending" ref="intersectionTarget" />
       </div>
     </div>
   </div>
 </template>
+
+<style>
+
+.v-popper--theme-tooltip .v-popper__inner {
+  background: rgb(219,223,229);
+  padding: 7px;
+  border-radius: 13px;
+}
+
+.v-popper--theme-tooltip .v-popper__arrow-outer {
+  border-color:rgb(219,223,229);
+}
+
+</style>

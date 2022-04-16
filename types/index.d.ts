@@ -135,3 +135,10 @@ export interface Question {
   matchedProperties: string[]
   correctAnswer: CorrectAnswer
 }
+
+export interface ActiveSortField {
+  field: 'created' | 'fScore' | 'id' | 'rank'
+  direction: 'asc' | 'desc'
+}
+
+export type SortFunctions = Partial<Record<'created' | 'fScore'| 'rank' | 'id', (collection: T[]) => T[]>>
