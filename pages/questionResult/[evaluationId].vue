@@ -2,9 +2,12 @@
 import type { ActiveSortField, Question, QuestionResult } from '../../types'
 import orderedByKey from '../../utility/ordered'
 
+
 const route = useRoute()
 
 const store = useModalStore()
+
+store.searchTerm = ''
 
 const { data: questions, pending: pendingQuestions } = useLazyFetch<Question[]>('/api/questionsData', { params: route.params })
 const { data: questionResults, pending: pendingQuestionsResults } = useLazyFetch<QuestionResult[]>('/api/questionResultData', { params: route.params })

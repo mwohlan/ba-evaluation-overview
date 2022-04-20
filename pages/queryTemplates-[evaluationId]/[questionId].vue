@@ -5,6 +5,7 @@ import orderedByKey from '../../utility/ordered'
 const route = useRoute()
 const { data: queryTemplates, pending } = useLazyFetch<QueryTemplate[]>('/api/queryTemplateData', { params: route.params })
 const store = useModalStore()
+store.searchTerm = ''
 const activeSortField = ref<ActiveSortField>({ field: 'rank', direction: 'desc' })
 
 const intersectionTarget = ref(null)
