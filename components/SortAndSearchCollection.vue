@@ -8,10 +8,12 @@ const props = defineProps<{
   keys: string[]
 }>()
 
+const store = useModalStore()
+
 </script>
 
 <template>
-  <div mb-3 flex gap-x-3 cursor-pointer>
+  <div flex gap-x-3 cursor-pointer>
     <template v-for="key in keys" :key="key">
       <div :class="activeSortField.field === key ? 'font-semibold text-gray-800':'font-normal text-gray-600'" flex gap-x-1 items-center px-3 bg-gray-300 rounded-lg @click="toggleActiveSortField(key)">
         <div>
@@ -31,5 +33,17 @@ const props = defineProps<{
         />
       </div>
     </template>
+  </div>
+  <div ml-3 cursor-pointer text-gray-700 h-7 w-7 i-ic:outline-search @click="store.isOpen = !store.isOpen" />
+  <div v-if="store.searchTerm != ''" ml-1>
+    <div text-xs>
+      Search Term:
+    </div>
+    <div flex items-center gap-x-1>
+      <div text-xs font-semibold>
+        {{ store.searchTerm }}
+      </div>
+      <div cursor-pointer h-4 w-4 i-ic:outline-cancel @click="store.searchTerm = ''" />
+    </div>
   </div>
 </template>

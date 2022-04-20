@@ -3,8 +3,8 @@ import type { ActiveSortField, QueryTemplate } from '../../types'
 import orderedByKey from '../../utility/ordered'
 
 const route = useRoute()
-const { data: queryTemplates, pending } = await useLazyFetch<QueryTemplate[]>('/api/queryTemplateData', { params: route.params })
-
+const { data: queryTemplates, pending } = useLazyFetch<QueryTemplate[]>('/api/queryTemplateData', { params: route.params })
+const store = useModalStore()
 const activeSortField = ref<ActiveSortField>({ field: 'rank', direction: 'desc' })
 
 const intersectionTarget = ref(null)
@@ -14,8 +14,9 @@ const sortFunctions = {
   fScore: (queryTemplates: QueryTemplate[]) => queryTemplates.sort((a, z) => Math.max(...z.answers.map(a => a.fScore)) - Math.max(...a.answers.map(a => a.fScore))),
 
 }
-const { sortedCollection: sortedQueryTemplates, toggleActiveSortField }
-= useSortedCollection(queryTemplates, sortFunctions, activeSortField, ref(5), intersectionTarget)
+
+const { sortedAndSearchedCollection: sortedQueryTemplates, toggleActiveSortField }
+= useSortedCollection(queryTemplates, pending, sortFunctions, activeSortField, ref(5), intersectionTarget)
 
 definePageMeta({
   layout: 'default',
@@ -36,7 +37,9 @@ definePageMeta({
         <div text-2xl font-bold mb-2 sm:mb-5>
           Query Templates
         </div>
-        <SortCollection :keys="Object.keys(sortFunctions)" :toggle-active-sort-field="toggleActiveSortField" :active-sort-field="activeSortField" />
+        <div class="flex items-center mb-3">
+          <SortAndSearchCollection :keys="Object.keys(sortFunctions)" :toggle-active-sort-field="toggleActiveSortField" :active-sort-field="activeSortField" />
+        </div>
         <div v-if="pending" self-center text-gray-700 w-14 h-14 i-eos-icons:loading />
         <div v-else-if="sortedQueryTemplates.length == 0" px-3 py-2 flex gap-x-3 items-center bg-gray-300 rounded mt-4>
           <div i-icon-park-outline:caution h-8 w-8 text-yellow-600 />
@@ -85,7 +88,12 @@ definePageMeta({
                   </div>
                   <div class="text-sm space-y-1 font-medium text-gray-700">
                     <div v-for="queryScore in queryTemplate.queryScores" :key="queryScore.metric">
-                      <VTooltip :placement="'auto'">
+                      <VTooltip
+                        :handle-resize="true"
+                        :distance="10"
+                        :delay="300"
+                        :placement="'auto'"
+                      >
                         <div flex gap-x-3 justify-between>
                           <div>
                             {{ queryScore.metric.replace('Avg', '') }}:
@@ -177,5 +185,4 @@ definePageMeta({
 .v-popper--theme-tooltip .v-popper__arrow-outer {
   border-color:rgb(219,223,229);
 }
-
 </style>

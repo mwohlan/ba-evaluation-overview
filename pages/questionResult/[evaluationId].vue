@@ -4,8 +4,10 @@ import orderedByKey from '../../utility/ordered'
 
 const route = useRoute()
 
-const { data: questions } = await useLazyFetch<Question[]>('/api/questionsData', { params: route.params })
-const { data: questionResults, pending } = await useLazyFetch<QuestionResult[]>('/api/questionResultData', { params: route.params })
+const store = useModalStore()
+
+const { data: questions, pending: pendingQuestions } = useLazyFetch<Question[]>('/api/questionsData', { params: route.params })
+const { data: questionResults, pending: pendingQuestionsResults } = useLazyFetch<QuestionResult[]>('/api/questionResultData', { params: route.params })
 
 const activeSortField = ref<ActiveSortField>({ field: 'id', direction: 'asc' })
 
@@ -16,12 +18,13 @@ const sortFunctions = {
   fScore: (questionResults: QuestionResult[]) => questionResults.sort((a, z) => z.fScore - a.fScore),
 
 }
-const { sortedCollection: sortedQuestionResults, toggleActiveSortField }
-= useSortedCollection(questionResults, sortFunctions, activeSortField, ref(5), intersectionTarget)
+
+const { sortedAndSearchedCollection: sortedQuestionResults, toggleActiveSortField }
+= useSortedCollection(questionResults, computed(() => pendingQuestionsResults.value || pendingQuestions.value), sortFunctions, activeSortField, ref(5), intersectionTarget)
 
 const wordAlternatives = (question: Question) => {
   const wordAlternatives = []
-  question.formattedQuestion.split(' ').forEach((word) => {
+  question?.formattedQuestion.split(' ')?.forEach((word) => {
     wordAlternatives
       .push(question.wordAlternatives[word]
         .filter(alternative => alternative !== word)
@@ -45,13 +48,15 @@ definePageMeta({
   <div>
     <div class="py-2 sm:py-5 flex justify-center overflow-hidden">
       <div container flex flex-col items-center>
-        <div text-2xl font-bold mb-2 sm:mb-5>
+        <div text-2xl font-bold mb-2 sm:mb-5 @click="pendingQuestions = true">
           Question Results
         </div>
-        <SortCollection :keys="Object.keys(sortFunctions)" :toggle-active-sort-field="toggleActiveSortField" :active-sort-field="activeSortField" />
+        <div class="flex items-center mb-3">
+          <SortAndSearchCollection :keys="Object.keys(sortFunctions)" :toggle-active-sort-field="toggleActiveSortField" :active-sort-field="activeSortField" />
+        </div>
 
         <ul id="list" gap-y-4 flex flex-col max-w-3xl w-screen px-2 sm:px-4>
-          <div v-if="pending" self-center text-gray-700 w-14 h-14 i-eos-icons:loading />
+          <div v-if="pendingQuestionsResults || pendingQuestions" self-center text-gray-700 w-14 h-14 i-eos-icons:loading />
           <li v-for="questionResult in sortedQuestionResults" v-else :key="questionResult.evaluationId" ring ring-gray-400 sm:px-4 px-2 py-2 space-y-4 w-full shadow-md bg-white rounded-md>
             <div flex justify-between>
               <NuxtLink text-gray-600 hover:text-gray-800 flex items-center gap-x-2 :to="{name:'index'}">
@@ -176,7 +181,7 @@ definePageMeta({
             </div>
           </li>
         </ul>
-        <div v-if="!pending" ref="intersectionTarget" />
+        <div v-if="!pendingQuestionsResults" ref="intersectionTarget" />
       </div>
     </div>
   </div>

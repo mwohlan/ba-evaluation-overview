@@ -33,7 +33,7 @@ const [showRuntimeStats, toggleRuntimeStats] = useToggle(false)
               {{ setting }}
             </td>
             <td class=" px-3 p1-4 text-right text-sm text-gray-700">
-              {{ setting.includes('Time') ? value.toFixed(2) : value }}{{setting.includes('Time') ? 's':''}}
+              {{ setting.includes('Time') ? value.toFixed(2) : value }}{{ setting.includes('Time') ? 's':'' }}
             </td>
           </tr>
 

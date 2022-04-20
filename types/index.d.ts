@@ -31,6 +31,7 @@ export interface RuntimeStats {
 }
 
 export interface Answer {
+  /** This is a description of the foo function. */
   query: string
   values: string[]
   fScore: number

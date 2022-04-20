@@ -1,4 +1,4 @@
-import { defineNuxtConfig } from 'nuxt3'
+import { defineNuxtConfig } from 'nuxt'
 export default defineNuxtConfig({
   // meta: {
   //   title: 'Vitesse Nuxt 3',
@@ -11,9 +11,26 @@ export default defineNuxtConfig({
     '@unocss/nuxt',
     '@pinia/nuxt',
     'floating-vue/nuxt',
+    '@nuxtjs/color-mode',
   ],
   vueuse: {
     ssrHandlers: true,
+  },
+  build: {
+    transpile: ['@headlessui/vue'],
+  },
+  autoImports: {
+    dirs: [
+      'composables',
+      'stores',
+      'types',
+    ],
+  },
+  colorMode: {
+    classSuffix: '',
+  },
+  typescript: {
+    shim: false,
   },
   ssr: true,
   publicRuntimeConfig: {

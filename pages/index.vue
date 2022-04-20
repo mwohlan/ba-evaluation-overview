@@ -1,12 +1,14 @@
 <script lang="ts" setup>
-import type { ActiveSortField, Evaluation, SortFunctions } from '../types'
+
 import orderedByKey from '../utility/ordered'
 import RuntimeStats from '~~/components/RuntimeStats.vue'
 import useSortedCollection from '~~/composables/useSortedCollection'
+import type { ActiveSortField, Evaluation, SortFunctions } from '~~/types'
 
-const { data: evaluations, pending } = await useLazyFetch<Evaluation[]>('/api/evaluationData')
+const { data: evaluations, pending } = useLazyFetch<Evaluation[]>('/api/evaluationData')
 const activeSortField = ref<ActiveSortField>({ field: 'created', direction: 'desc' })
-
+const store = useModalStore()
+store.searchTerm = ''
 const sortFunctions: SortFunctions = {
   created: (evaluations: Evaluation[]) => evaluations.sort((a, z) => z.created.seconds - a.created.seconds),
   fScore: (evaluations: Evaluation[]) => evaluations.sort((a, z) => z.evaluationResult.avgFScore - a.evaluationResult.avgFScore),
@@ -14,8 +16,8 @@ const sortFunctions: SortFunctions = {
 }
 
 const intersectionTarget = ref(null)
-const { sortedCollection: sortedEvaluations, toggleActiveSortField }
-= useSortedCollection(evaluations, sortFunctions, activeSortField, ref(5), intersectionTarget)
+const { sortedAndSearchedCollection: sortedEvaluations, toggleActiveSortField }
+= useSortedCollection(evaluations, pending, sortFunctions, activeSortField, ref(5), intersectionTarget)
 
 definePageMeta({
   layout: 'default',
@@ -36,7 +38,9 @@ definePageMeta({
       <div text-2xl font-bold mb-2 sm:mb-5>
         Evaluations Overview
       </div>
-      <SortCollection :keys="Object.keys(sortFunctions)" :toggle-active-sort-field="toggleActiveSortField" :active-sort-field="activeSortField" />
+      <div class="flex items-center mb-3">
+        <SortAndSearchCollection :keys="Object.keys(sortFunctions)" :toggle-active-sort-field="toggleActiveSortField" :active-sort-field="activeSortField" />
+      </div>
       <ul v-if="!pending" flex gap-y-6 flex-col max-w-3xl w-screen px-2 sm:px-4>
         <div v-for="evaluation in sortedEvaluations" :key="evaluation.firestoreId" ring ring-gray-400 sm:px-4 px-2 py-2 shadow-md bg-white rounded-md>
           <div flex justify-between>
