@@ -19,17 +19,6 @@ const intersectionTarget = ref(null)
 const { sortedAndSearchedCollection: sortedEvaluations, toggleActiveSortField }
 = useSortedCollection(evaluations, pending, sortFunctions, activeSortField, ref(5), intersectionTarget)
 
-definePageMeta({
-  layout: 'default',
-  pageTransition: {
-    enterFromClass: 'translate-x-20 op-0',
-    enterToClass: 'translate-x-0 op-100',
-    leaveToClass: 'op-0 translate-x-20',
-    leaveActiveClass: 'duration-300',
-    enterActiveClass: 'duration-200',
-    mode: 'out-in',
-  },
-})
 </script>
 
 <template>
