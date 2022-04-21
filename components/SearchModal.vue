@@ -68,10 +68,20 @@ whenever(Ctrl_k, () => {
 
               <div class="relative">
                 <input
-                  id="id1" :value="store.searchTerm"
-                  type="search" autocomplete="off" name="name1" placeholder="your name" class="peer pl-11 relative text-gray-600 font-semibold bg-light-50  w-full placeholder-transparent outline-none focus:outline-none border border-gray-300 focus:border-gray-400 rounded-lg p-4" @input="(e: InputEvent) => changeValue(e.target.value)"
+                  id="id1"
+                  :value="store.searchTerm"
+                  type="search"
+                  autocomplete="off"
+                  name="name1"
+                  placeholder="your name"
+                  class="peer pl-11 relative text-gray-600 font-semibold bg-light-50  w-full placeholder-transparent outline-none focus:outline-none border border-gray-300 focus:border-gray-400 rounded-lg p-4"
+                  @input="(e: InputEvent) => changeValue(e.target.value)"
                 >
-                <label for="id1" class="bg-light-50 duration-150 absolute z-[10] left-9 px-2 -top-2 text-gray-600 duration-150 text-xs peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-4 !peer-focus:-top-2 !peer-focus:text-gray-600 !peer-focus:text-xs">Search Evaluations</label>
+                <label
+                  for="id1"
+                  class="bg-light-50 duration-150 absolute z-[10] left-9 px-2 -top-2 text-gray-600 duration-150 text-xs peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-4 !peer-focus:-top-2 !peer-focus:text-gray-600 !peer-focus:text-xs"
+                >
+                  Search Evaluations</label>
                 <div text-gray-400 absolute z-10 h-6 w-6 top-5 left-2 i-ic:outline-search />
                 <div v-if="store.searchTerm !== ''" mt-3 text-gray-600>
                   Number of results: {{ store.numberOfSearchResults }}
@@ -84,13 +94,3 @@ whenever(Ctrl_k, () => {
     </TransitionRoot>
   </div>
 </template>
-
-<style>
-/* Remove chrome autofill colors */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active  {
-    -webkit-box-shadow: 0 0 0 30px white inset !important;
-}
-</style>

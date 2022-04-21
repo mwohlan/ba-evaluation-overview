@@ -50,12 +50,6 @@ export default defineNuxtConfig({
     APP_ID: process.env.APP_ID,
   },
   unocss: {
-    webFonts: {
-      provider: 'google',
-      fonts: {
-        mulish: 'Mulish:200,300,400,500,600,700,800,900',
-      },
-    },
     uno: true,
     icons: {
       scale: 1.2,
