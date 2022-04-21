@@ -25,8 +25,8 @@ definePageMeta({
     enterFromClass: 'translate-x-20 op-0',
     enterToClass: 'translate-x-0 op-100',
     leaveToClass: 'op-0 translate-x-20',
-    leaveActiveClass: 'duration-5000',
-    enterActiveClass: 'duration-5000',
+    leaveActiveClass: 'duration-300',
+    enterActiveClass: 'duration-200',
     mode: 'out-in',
   },
 })
