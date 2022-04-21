@@ -6,7 +6,7 @@ const store = useModalStore()
   <main class="h-screen w-screen sib bg-warm-gray-100 overflow-x-hidden overflow-y-auto font-mulish">
     <Link rel="icon" type="image/x-icon" href="/favicon.svg" />
     <slot />
-    <SearchModal :is-open="store.isOpen" />
+    <LazySearchModal v-if="store.isOpen" :is-open="store.isOpen" />
   </main>
 </template>
 
