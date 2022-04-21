@@ -37,7 +37,7 @@ const store = useModalStore()
   <div ml-3 cursor-pointer text-gray-700 h-7 w-7 i-ic:outline-search @click="store.isOpen = !store.isOpen" />
   <div v-if="store.searchTerm != ''" ml-1>
     <div text-xs>
-      Search Term:
+      {{store.numberOfSearchResults}} results for:
     </div>
     <div flex items-center gap-x-1>
       <div text-xs font-semibold>

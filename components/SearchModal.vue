@@ -7,14 +7,6 @@ import {
   TransitionRoot,
 } from '@headlessui/vue'
 
-const { Ctrl_k } = useMagicKeys({
-  passive: false,
-  onEventFired(e) {
-    if (e.ctrlKey && e.key === 'k' && e.type === 'keydown')
-      e.preventDefault()
-  },
-})
-
 const store = useModalStore()
 function closeModal() {
   store.isOpen = false
@@ -24,10 +16,6 @@ const changeValue = useDebounceFn((value) => {
   store.searchTerm = value
 },
 500)
-
-whenever(Ctrl_k, () => {
-  store.isOpen = true
-})
 
 </script>
 

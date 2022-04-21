@@ -1,5 +1,15 @@
 <script setup>
 const store = useModalStore()
+const { Ctrl_k } = useMagicKeys({
+  passive: false,
+  onEventFired(e) {
+    if (e.ctrlKey && e.key === 'k' && e.type === 'keydown')
+      e.preventDefault()
+  },
+})
+whenever(Ctrl_k, () => {
+  store.isOpen = !store.isOpen
+})
 </script>
 
 <template>
