@@ -18,6 +18,7 @@ export interface NlpConfig {
   formatters: string[]
   wordAlternatives: string[]
   additionalWords: string[]
+  removeStopWords: boolean[]
 }
 
 export interface RuntimeStats {
@@ -142,4 +143,4 @@ export interface ActiveSortField {
   direction: 'asc' | 'desc'
 }
 
-export type SortFunctions = Partial<Record<'created' | 'fScore'| 'rank' | 'id', (collection: T[]) => T[]>>
+export type SortFunctions = Partial<Record<'created' | 'fScore' | 'rank' | 'id', (collection: T[]) => T[]>>

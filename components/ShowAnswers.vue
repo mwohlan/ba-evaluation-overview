@@ -2,18 +2,18 @@
 import isValidUrl from '../utility/checkValidUrl'
 import isResource from '../utility/checkResource'
 
-const [showAnswers, toggleAnswers] = useToggle(false)
-
 const props = defineProps<{
   values: Array<string>
 }>()
 
+const [showAnswers, toggleAnswers] = useToggle(false)
 </script>
+
 <template>
-  <div>
+  <div v-auto-animate>
     <div flex cursor-pointer gap-x-2 justify-center class="py-1.5" text-sm @click="toggleAnswers()">
       <div v-if="values.length > 0" text-gray-900>
-        {{ showAnswers ? 'Hide':'Show' }} Answers
+        {{ showAnswers ? 'Hide' : 'Show' }} Answers
       </div>
       <div v-else text-gray-900>
         No Answers

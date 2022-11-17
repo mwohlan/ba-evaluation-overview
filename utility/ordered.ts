@@ -1,4 +1,4 @@
-export default function <T>(unordered: T): T {
+export default function ordered <T>(unordered: T): T {
   return Object.keys(unordered).sort().reduce(
     (obj, key) => {
       obj[key] = unordered[key]

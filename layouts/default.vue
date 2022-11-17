@@ -1,5 +1,13 @@
 <script setup>
-const store = useModalStore()
+const modal = useModalStore()
+const user = useSupabaseUser()
+const client = useSupabaseClient()
+const route = useRoute()
+const mode = useColorMode()
+const signOut = () => {
+  client.auth.signOut()
+}
+
 const { Ctrl_k } = useMagicKeys({
   passive: false,
   onEventFired(e) {
@@ -8,15 +16,32 @@ const { Ctrl_k } = useMagicKeys({
   },
 })
 whenever(Ctrl_k, () => {
-  store.isOpen = !store.isOpen
+  modal.isOpen = !modal.isOpen
+})
+
+const main = ref(null)
+
+const { x, y } = useScroll(main)
+
+watch(() => route.name, () => {
+  setTimeout(() => {
+    const elem = document.getElementById('main')
+    elem.scrollTo({ top: 0, behavior: 'smooth' })
+  }, 700)
 })
 </script>
 
 <template>
-  <main class="h-screen w-screen sib bg-warm-gray-100 overflow-x-hidden overflow-y-auto font-mulish">
+  <main id="main" ref="main" dark="bg-warm-gray-800 text-gray-200" class="h-screen w-screen text-gray-600   bg-warm-gray-100 overflow-x-hidden overflow-y-auto font-mulish">
+    <div v-if="user && route.name !== 'login'" bg-gray-300 py-1 px-3 rounded-md shadow-md cursor-pointer absolute right-4 top-5 gap-x-1 flex items-center @click="signOut">
+      <div i-fe:logout />
+      <div>
+        {{ user?.email.split('@')[0] }}
+      </div>
+    </div>
     <Link rel="icon" type="image/x-icon" href="/favicon.svg" />
     <slot />
-    <LazySearchModal v-if="store.isOpen" :is-open="store.isOpen" />
+    <LazySearchModal :is-open="modal.isOpen" />
   </main>
 </template>
 
@@ -37,4 +62,7 @@ whenever(Ctrl_k, () => {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+html { height: 100%; overflow:auto; }
+body { height: 100%; }
 </style>

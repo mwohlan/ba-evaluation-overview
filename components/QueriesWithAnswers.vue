@@ -1,11 +1,9 @@
 <script lang="ts" setup>
-
 import type { Answer } from '../types'
 
 const props = defineProps<{
   answer: Answer
 }>()
-
 </script>
 
 <template>
